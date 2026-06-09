@@ -18,11 +18,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install mlflow docker pytest flake8
-          # Tambahkan library lain jika modelling.py butuh (misal: pandas scikit-learn)
-          pip install pandas scikit-learn joblib
-
+          pip install mlflow docker pytest flake8 dagshub pandas scikit-learn joblib
+          
       - name: Test with pytest
+        # Mengabaikan exit code 5 jika tidak ada file tes
         run: pytest || [ $? -eq 5 ]
 
       - name: Run training script
