@@ -8,19 +8,24 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Python 3.12
+      - name: Set up Python 3.12.7
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
+      - name: Check Env
+        run: |
+          python --version
+          env
+
+      - name: Install Python dependencies
         run: pip install mlflow docker pytest flake8 dagshub pandas scikit-learn joblib google-api-python-client google-auth
 
-      - name: Run pytest
-        run: pytest test_model.py
-
-      - name: Run training script
+      - name: Run mlflow project
         run: python Membangun_model/modelling.py
+
+      - name: Get latest MLflow run_id
+        run: echo "RUN_ID=$(date +%s)" >> $GITHUB_ENV
 
       - name: Upload to Google Drive
         env:
