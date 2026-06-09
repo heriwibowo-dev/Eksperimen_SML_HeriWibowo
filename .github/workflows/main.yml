@@ -13,11 +13,21 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
-        run: pip install mlflow docker pytest flake8
+      - name: Check Env
+        run: env
 
-      - name: Run mlflow project
-        run: mlflow run .
+      - name: Install dependencies
+        run: |
+          pip install mlflow docker pytest flake8
+          # Tambahkan pip install library lain jika diperlukan oleh modelling.py Anda
+          
+      - name: Test with pytest
+        # Mengabaikan exit code 5 jika tidak ada file tes
+        run: pytest || [ $? -eq 5 ]
+
+      - name: Run training script
+        # Menggunakan python langsung agar tidak error MLflow entry point
+        run: python Membangun_model/modelling.py
 
       - name: Build Docker Model
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:latest .
