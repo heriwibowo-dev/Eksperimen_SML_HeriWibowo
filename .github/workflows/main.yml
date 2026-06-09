@@ -14,13 +14,13 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install mlflow docker pytest flake8 pandas scikit-learn joblib dagshub
+        run: pip install mlflow docker pytest flake8 dagshub pandas scikit-learn joblib
 
-      - name: Run mlflow project
-        run: mlflow run .
+      - name: Run pytest
+        run: pytest test_model.py
 
-      - name: Get latest MLflow run_id
-        run: echo "RUN_ID=$(ls -t mlruns/0 | head -n1)" >> $GITHUB_ENV
+      - name: Run training script
+        run: python Membangun_model/modelling.py
 
       - name: Build Docker Model
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:latest .
@@ -31,10 +31,8 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Tag Docker Image
-        run: docker tag ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:latest ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:${{ github.sha }}
-
-      - name: Push Docker Image
+      - name: Tag and Push Docker Image
         run: |
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:latest ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:${{ github.sha }}
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:latest
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:${{ github.sha }}
