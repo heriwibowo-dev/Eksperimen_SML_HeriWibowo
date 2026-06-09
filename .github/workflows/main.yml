@@ -14,21 +14,13 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install mlflow docker pytest flake8 pandas scikit-learn joblib
+        run: pip install mlflow docker pytest flake8 pandas scikit-learn joblib dagshub
 
       - name: Run mlflow project
         run: mlflow run .
 
       - name: Get latest MLflow run_id
         run: echo "RUN_ID=$(ls -t mlruns/0 | head -n1)" >> $GITHUB_ENV
-
-      - name: Install Python dependencies
-        run: pip install google-auth google-api-python-client
-
-      - name: Upload to Google Drive
-        # Anda perlu mengatur Google Service Account sebagai Secret
-        # Jika belum ada, Anda bisa mengganti langkah ini dengan upload ke DagsHub
-        run: echo "Uploading to cloud storage..." 
 
       - name: Build Docker Model
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:latest .
