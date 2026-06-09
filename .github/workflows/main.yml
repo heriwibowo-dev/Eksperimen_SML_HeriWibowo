@@ -14,13 +14,20 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install mlflow docker pytest flake8 dagshub pandas scikit-learn joblib
+        run: pip install mlflow docker pytest flake8 dagshub pandas scikit-learn joblib google-api-python-client google-auth
 
       - name: Run pytest
         run: pytest test_model.py
 
       - name: Run training script
         run: python Membangun_model/modelling.py
+
+      - name: Upload to Google Drive
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+        run: |
+          echo "$GCP_SA_KEY" > gcp_key.json
+          python scripts/upload_to_drive.py
 
       - name: Build Docker Model
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:latest .
