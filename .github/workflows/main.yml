@@ -13,18 +13,19 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Check Env
-        run: env
-
       - name: Install dependencies
         run: |
           pip install mlflow docker pytest flake8 dagshub pandas scikit-learn joblib
           
       - name: Test with pytest
-        # Mengabaikan exit code 5 jika tidak ada file tes
         run: pytest || [ $? -eq 5 ]
 
       - name: Run training script
+        env:
+          # Memberi tahu DagsHub untuk tidak meminta input interaktif
+          DAGSHUB_STREAM_AUTH_TOKEN: ${{ secrets.DAGSHUB_TOKEN }} 
+          # Jika Anda tidak punya token, biarkan saja kosong, 
+          # skrip akan mendeteksi GitHub Actions dan tidak akan memaksa login
         run: python Membangun_model/modelling.py
 
       - name: Build Docker Model
