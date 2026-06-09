@@ -19,14 +19,13 @@ jobs:
       - name: Install dependencies
         run: |
           pip install mlflow docker pytest flake8
-          # Tambahkan pip install library lain jika diperlukan oleh modelling.py Anda
-          
+          # Tambahkan library lain jika modelling.py butuh (misal: pandas scikit-learn)
+          pip install pandas scikit-learn joblib
+
       - name: Test with pytest
-        # Mengabaikan exit code 5 jika tidak ada file tes
         run: pytest || [ $? -eq 5 ]
 
       - name: Run training script
-        # Menggunakan python langsung agar tidak error MLflow entry point
         run: python Membangun_model/modelling.py
 
       - name: Build Docker Model
@@ -38,5 +37,8 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Push Docker Image
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:latest
+      - name: Tag and Push Docker Image
+        run: |
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:latest ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:${{ github.sha }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:${{ github.sha }}
