@@ -1,16 +1,20 @@
 import os
 import mlflow
+import mlflow.sklearn
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split, RandomizedSearchCV
+# TAMBAHKAN BARIS INI:
+from sklearn.datasets import load_breast_cancer 
 
 # --- DETEKSI LINGKUNGAN ---
 if os.getenv("GITHUB_ACTIONS") == "true":
     mlflow.set_tracking_uri("https://dagshub.com/heriwibowo-dev/Eksperimen_SML_HeriWibowo.mlflow")
-    
-    # Gunakan kredensial langsung ke konfigurasi MLflow
-    # Ini cara paling ampuh untuk bypass error 401
-    mlflow.tracking.set_tracking_uri("https://dagshub.com/heriwibowo-dev/Eksperimen_SML_HeriWibowo.mlflow")
 else:
     import dagshub
     dagshub.init(repo_owner='heriwibowo-dev', repo_name='Eksperimen_SML_HeriWibowo', mlflow=True)
+
+# Sekarang baris data = load_breast_cancer() akan berjalan lancar
 
 # ... kode training Anda ...
 
