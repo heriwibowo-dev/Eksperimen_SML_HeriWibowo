@@ -3,18 +3,16 @@ import mlflow
 
 # --- DETEKSI LINGKUNGAN ---
 if os.getenv("GITHUB_ACTIONS") == "true":
-    # 1. Pastikan MLflow tahu harus kemana
     mlflow.set_tracking_uri("https://dagshub.com/heriwibowo-dev/Eksperimen_SML_HeriWibowo.mlflow")
     
-    # 2. Paksa MLflow menggunakan kredensial dari GitHub Secrets yang kita set di main.yml
-    # MLflow akan membaca variabel ini secara otomatis untuk autentikasi HTTP
-    os.environ['MLFLOW_TRACKING_USERNAME'] = os.getenv('MLFLOW_TRACKING_USERNAME')
-    os.environ['MLFLOW_TRACKING_PASSWORD'] = os.getenv('MLFLOW_TRACKING_PASSWORD')
+    # Gunakan kredensial langsung ke konfigurasi MLflow
+    # Ini cara paling ampuh untuk bypass error 401
+    mlflow.tracking.set_tracking_uri("https://dagshub.com/heriwibowo-dev/Eksperimen_SML_HeriWibowo.mlflow")
 else:
     import dagshub
     dagshub.init(repo_owner='heriwibowo-dev', repo_name='Eksperimen_SML_HeriWibowo', mlflow=True)
 
-# ... lanjut ke kode training Anda ...
+# ... kode training Anda ...
 
 # 2. Load data
 data = load_breast_cancer()
