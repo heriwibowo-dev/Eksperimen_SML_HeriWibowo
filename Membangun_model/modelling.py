@@ -2,24 +2,28 @@ import os
 import dagshub
 import mlflow
 
-# --- KONFIGURASI AUTENTIKASI ---
-# Pastikan nama variabel di os.getenv() SAMA PERSIS dengan di main.yml
+# --- KONFIGURASI OTOMATIS DAGSHUB ---
+# Library dagshub secara otomatis mencari environment variable 
+# bernama DAGSHUB_TOKEN dan DAGSHUB_USER_NAME (atau repo_owner)
 token = os.getenv('DAGSHUB_TOKEN')
-user_name = os.getenv('DAGSHUB_USERNAME') # Kita samakan dengan nama secret di GitHub
+user_name = os.getenv('DAGSHUB_USERNAME')
 
-if not token or not user_name:
-    # Ini adalah pesan error yang muncul, mari kita perjelas pesan errornya
-    raise EnvironmentError(f"Cek GitHub Secrets: token={bool(token)}, username={bool(user_name)}")
+if not token:
+    raise EnvironmentError("DAGSHUB_TOKEN tidak ditemukan!")
+if not user_name:
+    # Sebagai backup, jika DAGSHUB_USERNAME tidak ada, gunakan hardcode ini
+    user_name = 'heriwibowo-dev'
 
-# Login secara eksplisit
+# Login dan Inisialisasi
 dagshub.auth.add_app_token(token)
-
-# Inisialisasi
 dagshub.init(
     repo_owner=user_name, 
     repo_name='Eksperimen_SML_HeriWibowo', 
     mlflow=True
 )
+
+# --- SISA KODE ANDA ---
+# (Pastikan di bawah ini tidak ada lagi set_tracking_uri manual)
 # --- LOADING DATA ---
 data = load_breast_cancer()
 df = pd.DataFrame(data.data, columns=data.feature_names)
