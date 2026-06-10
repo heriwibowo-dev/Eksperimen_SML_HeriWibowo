@@ -1,29 +1,25 @@
 import os
-import mlflow
-import mlflow.sklearn
-import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
-from sklearn.datasets import load_breast_cancer
 import dagshub
+import mlflow
 
-# --- OTENTIKASI PAKSA ---
+# --- KONFIGURASI AUTENTIKASI ---
+# Pastikan nama variabel di os.getenv() SAMA PERSIS dengan di main.yml
 token = os.getenv('DAGSHUB_TOKEN')
-user_name = os.getenv('DAGSHUB_USER_NAME') # Pastikan ini diset di main.yml
+user_name = os.getenv('DAGSHUB_USERNAME') # Kita samakan dengan nama secret di GitHub
 
 if not token or not user_name:
-    raise EnvironmentError("Kredensial DagsHub tidak ditemukan di GitHub Secrets!")
+    # Ini adalah pesan error yang muncul, mari kita perjelas pesan errornya
+    raise EnvironmentError(f"Cek GitHub Secrets: token={bool(token)}, username={bool(user_name)}")
 
 # Login secara eksplisit
-dagshub.login(token=token)
+dagshub.auth.add_app_token(token)
 
-# Inisialisasi DagsHub untuk MLflow
+# Inisialisasi
 dagshub.init(
     repo_owner=user_name, 
     repo_name='Eksperimen_SML_HeriWibowo', 
     mlflow=True
 )
-
 # --- LOADING DATA ---
 data = load_breast_cancer()
 df = pd.DataFrame(data.data, columns=data.feature_names)
