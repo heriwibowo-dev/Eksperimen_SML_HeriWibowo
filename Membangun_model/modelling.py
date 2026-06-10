@@ -8,25 +8,21 @@ from sklearn.datasets import load_breast_cancer
 import dagshub
 
 # --- OTENTIKASI PAKSA ---
-# Pastikan token terbaca dari env (yang dikirim dari GitHub Actions)
 token = os.getenv('DAGSHUB_TOKEN')
-if not token:
-    raise EnvironmentError("DAGSHUB_TOKEN tidak ditemukan di environment!")
+user_name = os.getenv('DAGSHUB_USER_NAME') # Pastikan ini diset di main.yml
+
+if not token or not user_name:
+    raise EnvironmentError("Kredensial DagsHub tidak ditemukan di GitHub Secrets!")
 
 # Login secara eksplisit
-dagshub.auth.add_app_token(token)
+dagshub.login(token=token)
 
-# Inisialisasi DagsHub MLflow
+# Inisialisasi DagsHub untuk MLflow
 dagshub.init(
-    repo_owner='heriwibowo-dev', 
+    repo_owner=user_name, 
     repo_name='Eksperimen_SML_HeriWibowo', 
     mlflow=True
 )
-    print("DagsHub & MLflow terinisialisasi dengan sukses.")
-except Exception as e:
-    print(f"Gagal inisialisasi DagsHub: {e}")
-    # Fallback: Tetap set secara manual jika dagshub gagal
-    mlflow.set_tracking_uri("https://dagshub.com/heriwibowo-dev/Eksperimen_SML_HeriWibowo.mlflow")
 
 # --- LOADING DATA ---
 data = load_breast_cancer()
@@ -41,13 +37,12 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 mlflow.sklearn.autolog()
 
 with mlflow.start_run(run_name="RandomForest_Tuning_Advanced"):
+    rf = RandomForestClassifier(random_state=42)
     param_dist = {
         'n_estimators': [50, 100, 200],
         'max_depth': [None, 10, 20],
         'min_samples_split': [2, 5]
     }
-    
-    rf = RandomForestClassifier(random_state=42)
     tuner = RandomizedSearchCV(rf, param_dist, n_iter=5, cv=3, random_state=42)
     
     print("Memulai training...")
