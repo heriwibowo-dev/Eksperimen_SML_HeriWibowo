@@ -1,20 +1,20 @@
 import os
 import mlflow
-import mlflow.sklearn
-import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
-from sklearn.datasets import load_breast_cancer
 
-# --- DETEKSI LINGKUNGAN (OTOMATIS) ---
-# Jika di GitHub, gunakan token dari environment variables
-# Jika di Colab, gunakan dagshub.init() agar bisa login via browser
+# --- DETEKSI LINGKUNGAN ---
 if os.getenv("GITHUB_ACTIONS") == "true":
+    # 1. Pastikan MLflow tahu harus kemana
     mlflow.set_tracking_uri("https://dagshub.com/heriwibowo-dev/Eksperimen_SML_HeriWibowo.mlflow")
-    # GitHub akan menggunakan username/token dari env yang kita set di main.yml
+    
+    # 2. Paksa MLflow menggunakan kredensial dari GitHub Secrets yang kita set di main.yml
+    # MLflow akan membaca variabel ini secara otomatis untuk autentikasi HTTP
+    os.environ['MLFLOW_TRACKING_USERNAME'] = os.getenv('MLFLOW_TRACKING_USERNAME')
+    os.environ['MLFLOW_TRACKING_PASSWORD'] = os.getenv('MLFLOW_TRACKING_PASSWORD')
 else:
     import dagshub
     dagshub.init(repo_owner='heriwibowo-dev', repo_name='Eksperimen_SML_HeriWibowo', mlflow=True)
+
+# ... lanjut ke kode training Anda ...
 
 # 2. Load data
 data = load_breast_cancer()
