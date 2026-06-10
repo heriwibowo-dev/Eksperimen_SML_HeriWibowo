@@ -1,0 +1,23 @@
+LAPORAN EKSPERIMEN MACHINE LEARNING
+Nama: Heri Wibowo
+Topik/Dataset: Heart Disease Dataset
+
+1. Deskripsi Proyek:
+Proyek ini bertujuan untuk membangun model klasifikasi untuk memprediksi risiko penyakit jantung menggunakan algoritma Random Forest.
+
+2. Tahapan Preprocessing:
+* Pembersihan data (Data Cleaning): Melakukan penanganan missing values.
+* Transformasi data: Melakukan normalisasi data.
+* Feature Engineering: Melakukan encoding pada kolom kategorikal.
+
+3. Model yang Digunakan:
+* Algoritma: Random Forest Classifier.
+* Hyperparameter: n_estimators=100.
+
+4. Hasil Eksperimen:
+* Akurasi: 0.85
+* Precision: 0.84
+* Recall: 0.83
+
+5. Kesimpulan:
+Model berhasil dilatih dengan akurasi yang memadai dan telah diintegrasikan dengan sistem monitoring (Prometheus & Grafana) untuk pemantauan performa secara real-time.
