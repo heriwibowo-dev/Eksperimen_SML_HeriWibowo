@@ -6,33 +6,25 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Run actions/checkout@v3
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Python 3.12.7
+      - name: Set up Python 3.12
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
 
-      - name: Check Env
-        run: |
-          python --version
-          env
-
       - name: Install dependencies
-        run: pip install mlflow docker pytest flake8 dagshub pandas scikit-learn joblib google-api-python-client google-auth
+        run: pip install mlflow dagshub pandas scikit-learn joblib google-api-python-client google-auth docker
 
       - name: Run mlflow project
         env:
-          # Menggunakan cara DagsHub-native agar otentikasi lebih stabil
           DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+          DAGSHUB_USER_NAME: ${{ secrets.DAGSHUB_USERNAME }}
         run: python Membangun_model/modelling.py
 
       - name: Get latest MLflow run_id
         run: echo "RUN_ID=$(date +%s)" >> $GITHUB_ENV
-
-      - name: Install Python dependencies
-        run: pip list
 
       - name: Upload to Google Drive
         env:
@@ -41,19 +33,10 @@ jobs:
           echo "$GCP_SA_KEY" > gcp_key.json
           python scripts/upload_to_drive.py
 
-      - name: Build Docker Model
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:latest .
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Tag Docker Image
-        run: docker tag ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:latest ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:${{ github.sha }}
-
-      - name: Push Docker Image
+      - name: Build and Push Docker
         run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:latest .
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:latest ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:${{ github.sha }}
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:latest
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:${{ github.sha }}
