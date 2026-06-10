@@ -1,6 +1,15 @@
 import os
-import dagshub
 import mlflow
+import mlflow.sklearn
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split, RandomizedSearchCV
+# --- TAMBAHKAN BARIS INI KEMBALI ---
+from sklearn.datasets import load_breast_cancer
+# -----------------------------------
+import dagshub
+
+# ... (kode otentikasi Anda yang sudah benar) ...
 
 # --- KONFIGURASI OTOMATIS DAGSHUB ---
 # Library dagshub secara otomatis mencari environment variable 
