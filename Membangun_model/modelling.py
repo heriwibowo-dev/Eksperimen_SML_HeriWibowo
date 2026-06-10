@@ -5,19 +5,23 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.datasets import load_breast_cancer
+import dagshub
 
-# --- KONFIGURASI AUTENTIKASI ---
-# Dengan menggunakan dagshub.init, library ini akan otomatis mendeteksi 
-# DAGSHUB_TOKEN dari environment variable dan melakukan login ke DagsHub.
-# Ini jauh lebih stabil daripada melakukan set_tracking_uri secara manual.
+# --- OTENTIKASI PAKSA ---
+# Pastikan token terbaca dari env (yang dikirim dari GitHub Actions)
+token = os.getenv('DAGSHUB_TOKEN')
+if not token:
+    raise EnvironmentError("DAGSHUB_TOKEN tidak ditemukan di environment!")
 
-try:
-    import dagshub
-    dagshub.init(
-        repo_owner='heriwibowo-dev', 
-        repo_name='Eksperimen_SML_HeriWibowo', 
-        mlflow=True
-    )
+# Login secara eksplisit
+dagshub.auth.add_app_token(token)
+
+# Inisialisasi DagsHub MLflow
+dagshub.init(
+    repo_owner='heriwibowo-dev', 
+    repo_name='Eksperimen_SML_HeriWibowo', 
+    mlflow=True
+)
     print("DagsHub & MLflow terinisialisasi dengan sukses.")
 except Exception as e:
     print(f"Gagal inisialisasi DagsHub: {e}")
